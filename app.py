@@ -136,6 +136,15 @@ def local_credentials_configured():
                 and len(os.environ.get('LOCAL_ADMIN_PASSWORD', '')) >= 12)
 
 
+def remote_local_admin_enabled():
+    password = os.environ.get('LOCAL_ADMIN_PASSWORD', '')
+    return (os.environ.get('ENABLE_REMOTE_LOCAL_ADMIN') == '1'
+            and not app.debug
+            and not os.environ.get('FIREBASE_WEB_API_KEY', '').strip()
+            and local_credentials_configured()
+            and len(password) >= 16)
+
+
 def login_rate_limited(ip):
     with attempt_lock:
         attempts[ip] = [t for t in attempts[ip] if time.time() - t < 300]
@@ -149,7 +158,9 @@ def admin_required(view):
     @wraps(view)
     def guarded(*args, **kwargs):
         if session.get('local_admin'):
-            if not local_development_request() or time.time() - session.get('last_active', 0) > 900:
+            local_login_allowed = (local_development_request() and local_credentials_configured()
+                                   or remote_local_admin_enabled())
+            if not local_login_allowed or time.time() - session.get('last_active', 0) > 900:
                 session.clear()
                 return redirect(url_for('login'))
             g.admin = {'id': 'local-admin', 'nombre': 'Administrador local', 'rol': 'Admin'}
@@ -177,7 +188,9 @@ def admin_required(view):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     configured = bool(os.environ.get('FIREBASE_WEB_API_KEY'))
-    local_configured = local_development_request() and local_credentials_configured()
+    remote_local_configured = remote_local_admin_enabled()
+    local_configured = (local_development_request() and local_credentials_configured()
+                        or remote_local_configured)
     can_login = configured or local_configured
     if request.method == 'POST':
         if local_configured:
@@ -185,7 +198,9 @@ def login():
             if login_rate_limited(ip):
                 flash('Demasiados intentos. Espera cinco minutos.', 'danger')
                 return render_template('login.html', page='login', configured=configured,
-                                       local_configured=local_configured, can_login=can_login), 429
+                                       local_configured=local_configured,
+                                       remote_local_configured=remote_local_configured,
+                                       can_login=can_login), 429
             expected_email = os.environ.get('LOCAL_ADMIN_EMAIL', '').strip().lower()
             expected_password = os.environ.get('LOCAL_ADMIN_PASSWORD', '')
             supplied_email = request.form.get('email', '').strip().lower()
@@ -205,7 +220,9 @@ def login():
             if login_rate_limited(ip):
                 flash('Demasiados intentos. Espera cinco minutos.', 'danger')
                 return render_template('login.html', page='login', configured=configured,
-                                       local_configured=local_configured, can_login=can_login), 429
+                                       local_configured=local_configured,
+                                       remote_local_configured=remote_local_configured,
+                                       can_login=can_login), 429
             try:
                 result = requests.post('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword',
                     params={'key': os.environ['FIREBASE_WEB_API_KEY']}, timeout=15,
@@ -227,7 +244,9 @@ def login():
                 app.logger.error('No se pudo completar la autenticación.')
                 flash('No se pudo conectar con el servicio de acceso. Inténtalo nuevamente.', 'danger')
     return render_template('login.html', page='login', configured=configured,
-                           local_configured=local_configured, can_login=can_login)
+                           local_configured=local_configured,
+                           remote_local_configured=remote_local_configured,
+                           can_login=can_login)
 
 
 @app.route('/registro-admin', methods=['GET', 'POST'])

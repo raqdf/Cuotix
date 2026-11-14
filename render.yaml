@@ -11,6 +11,12 @@ services:
         sync: false
       - key: FIREBASE_WEB_API_KEY
         sync: false
+      - key: ENABLE_REMOTE_LOCAL_ADMIN
+        sync: false
+      - key: LOCAL_ADMIN_EMAIL
+        sync: false
+      - key: LOCAL_ADMIN_PASSWORD
+        sync: false
       - key: COOKIE_SECURE
         value: "1"
       - key: FLASK_DEBUG

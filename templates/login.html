@@ -57,10 +57,12 @@
 <p class="text-secondary">Ingresa con tu cuenta administrativa para iniciar.</p>
 <div class="access-role">{{ icon('shield') }} Administrador <span>Finanzas & Control</span>
 </div>
-{% if local_configured and not configured %}
+{% if remote_local_configured %}
+<div class="alert alert-warning small">Acceso temporal local activo para este servicio. Usa una contraseña exclusiva y desactívalo al configurar Firebase.</div>
+{% elif local_configured and not configured %}
 <div class="alert alert-info small">Modo local de desarrollo activo. Solo funciona en esta computadora.</div>
 {% elif not configured %}
-<div class="alert alert-warning small">Configura Firebase Web o las credenciales locales en .env para habilitar el inicio de sesión.</div>
+<div class="alert alert-warning small">Configura Firebase Web o habilita el acceso local temporal en Render para iniciar sesión.</div>
 {% endif %}
 <form method="post" action="{{ url_for('login') }}">{{ csrf() }}<label class="form-label" for="email">Correo electrónico <span class="text-danger">*</span>
 </label>

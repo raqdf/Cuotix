@@ -1,0 +1,25 @@
+{% from "_macros.html" import icon, csrf, empty, stat, receipts_table with context %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#3b2818">
+<link rel="icon" href="{{ url_for('static', filename='images/credisol-mark.svg') }}" type="image/svg+xml">
+<title>{{ titles.get(page, 'Acceso administrativo') }} · Cuotix</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js">
+</script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% block styles %}{% endblock %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/paletas.css') }}">
+<script defer src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% block scripts %}{% endblock %}
+</head>
+<body class="{{ 'access-page' if page in ['login', 'error'] else 'admin-page' }}">
+{% include "_iconos.html" %}
+{% include "_avisos.html" %}
+{% block content %}{% endblock %}
+</body>
+</html>

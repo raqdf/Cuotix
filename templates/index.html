@@ -1,0 +1,68 @@
+{% extends "panel.html" %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/monitoreo.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/graficos.css') }}">
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script defer src="{{ url_for('static', filename='js/graficos.js') }}"></script>
+{% endblock %}
+
+{% block page_content %}
+{% include "_filtros_cobros.html" %}
+
+<div class="content-grid">
+  <section class="card-panel">
+    <div class="section-heading">
+      <div>
+        <h2>{{ icon('grid') }} Flujo de Cobros</h2>
+        <p>Recibos del período seleccionado</p>
+      </div>
+      <span class="tag">{{ receipts|length }} recibos</span>
+    </div>
+    {{ receipts_table(receipts) }}
+  </section>
+
+  <section class="card-panel">
+    <div class="section-heading">
+      <h2>Progreso de Cobradores</h2>
+      <span class="small text-secondary">Meta diaria</span>
+    </div>
+    <div class="padded">
+      {% for u in data.cobradores %}
+        {% set avance = [[(u.avance or 0)|int, 0]|max, 100]|min %}
+        <div class="collector-progress">
+          <div>
+            <strong>{{ u.nombre }}</strong>
+            <span class="mono text-primary">{{ u.hoy|money }}</span>
+          </div>
+          <div class="progress" role="progressbar"
+               aria-label="Avance de {{ u.nombre }}"
+               aria-valuenow="{{ avance }}" aria-valuemin="0" aria-valuemax="100">
+            <div class="progress-bar" style="--avance: {{ avance }}%"></div>
+          </div>
+          <small>
+            {{ u.get('ruta') or 'Ruta sin asignar' }}
+            <span>{{ 'Meta ' + (u.metaDiaria|money) if u.get('metaDiaria') else 'Meta no configurada' }}</span>
+          </small>
+        </div>
+      {% else %}
+        {{ empty('No hay cobradores registrados.') }}
+      {% endfor %}
+      <a href="/cobradores" class="btn btn-light w-100 mt-3">Gestionar equipo {{ icon('arrow') }}</a>
+    </div>
+  </section>
+</div>
+
+<section class="card-panel mt-4">
+  <div class="section-heading">
+    <div>
+      <h2>{{ icon('chart') }} Recaudación · últimos 7 días</h2>
+      <p>Importes de recibos registrados, en córdobas</p>
+    </div>
+  </div>
+  <div class="trend-chart" data-trend='{{ trend|tojson }}'></div>
+</section>
+{% endblock %}

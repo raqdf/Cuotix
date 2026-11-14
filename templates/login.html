@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script defer src="{{ url_for('static', filename='js/login.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<main class="access-shell">
+<div class="gateway">
+<span>{{ icon('shield') }} Acceso administrativo</span>
+<span>Firebase Authentication <span class="dot green">
+</span>
+</span>
+</div>
+<div class="access-card">
+<section class="access-brand">
+<div class="brand-large">
+<img class="brand-large-logo" src="{{ url_for('static', filename='images/credisol-logo-inverse.svg') }}" alt="CREDISOL, Crédito Solidario">
+<div class="brand-product">CUOTIX <span class="pro">ADMIN</span>
+<small>Mesa de Control & Microfinanzas</small>
+</div>
+</div>
+<div class="overline">SUPERVISIÓN CENTRALIZADA</div>
+<h1>Tu operación.<br>Siempre bajo control.</h1>
+<p>Administra tu equipo de cobradores, supervisa la cartera y lleva el control de cada movimiento.</p>
+<div class="access-features">
+<div>{{ icon('people') }}<strong>Tu equipo</strong>
+<span>Cobradores y accesos</span>
+</div>
+<div>{{ icon('wallet') }}<strong>Tu cartera</strong>
+<span>Créditos y recaudación</span>
+</div>
+</div>
+<div class="access-visual">
+<span>Una visión completa de tu operación</span>
+<svg viewBox="0 0 450 90" aria-hidden="true">
+<defs>
+<linearGradient id="fill" x1="0" y1="0" x2="0" y2="1">
+<stop stop-color="#6bf0c4" stop-opacity=".3"/>
+<stop offset="1" stop-color="#6bf0c4" stop-opacity="0"/>
+</linearGradient>
+</defs>
+<path d="M0 70Q45 75 90 50T180 35T270 48T360 24T450 12V90H0Z" fill="url(#fill)"/>
+<path d="M0 70Q45 75 90 50T180 35T270 48T360 24T450 12" stroke="#6bf0c4" stroke-width="3" fill="none"/>
+</svg>
+</div>
+<div class="access-note">{{ icon('shield') }} Acceso reservado a administradores autorizados de Cuotix.</div>
+</section>
+<section class="access-form">
+<span class="eyebrow">BIENVENIDO A CUOTIX</span>
+<h2>Acceso a tu estación<br>de trabajo</h2>
+<p class="text-secondary">Ingresa con tu cuenta administrativa para iniciar.</p>
+<div class="access-role">{{ icon('shield') }} Administrador <span>Finanzas & Control</span>
+</div>
+{% if local_configured and not configured %}
+<div class="alert alert-info small">Modo local de desarrollo activo. Solo funciona en esta computadora.</div>
+{% elif not configured %}
+<div class="alert alert-warning small">Configura Firebase Web o las credenciales locales en .env para habilitar el inicio de sesión.</div>
+{% endif %}
+<form method="post" action="{{ url_for('login') }}">{{ csrf() }}<label class="form-label" for="email">Correo electrónico <span class="text-danger">*</span>
+</label>
+<input class="form-control mb-4" type="email" id="email" name="email" autocomplete="username" placeholder="admin@tuempresa.com" required maxlength="150">
+<label class="form-label" for="password">Contraseña de acceso <span class="text-danger">*</span>
+</label>
+<div class="password-wrap">
+<input class="form-control" type="password" id="password" name="password" autocomplete="current-password" required>
+<button type="button" data-toggle-password="password" aria-label="Mostrar contraseña">Ver</button>
+</div>
+<div class="session-note">{{ icon('clock') }} Cierre de sesión tras 15 minutos de inactividad</div>
+<button class="btn btn-primary w-100 btn-login" {% if not can_login %}disabled{% endif %}>Ingresar al Panel de Control {{ icon('arrow') }}</button>
+</form>
+<a class="btn btn-light w-100 mt-3" href="{{ url_for('register_admin') }}">Crear primera cuenta de administrador</a>
+<div class="access-help">{{ icon('lock') }} Tu cuenta debe tener el rol Admin en Cuotix.</div>
+</section>
+</div>
+<footer class="access-footer">
+<span>CUOTIX · Administración de microfinanzas</span>
+<span>Conexión con Firebase</span>
+</footer>
+</main>
+{% endblock %}

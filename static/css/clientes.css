@@ -1,0 +1,72 @@
+/* Cuotix: clientes. */
+.client-tabs {
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin:0 0 22px;
+}
+
+.client-tabs .tag {
+    padding:6px 12px;
+}
+
+.client-summary {
+    display:grid;
+    grid-template-columns:1.15fr 1fr 1fr;
+    gap:18px;
+}
+
+.detail-label {
+    font-size:9px;
+    letter-spacing:.5px;
+    margin-bottom:5px;
+}
+
+.detail-row {
+    font-size:11px;
+    display:flex;
+    justify-content:space-between;
+    gap:14px;
+    border-bottom:1px solid var(--line);
+    padding:14px 0;
+}
+
+.detail-row>strong {
+    text-align:right;
+    font-weight:500;
+}
+
+.client-summary .metric-value {
+    font-size:24px;
+}
+
+.credit-card {
+    border-left:4px solid var(--blue);
+}
+
+.loan-values {
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:12px;
+}
+
+.loan-values>div {
+    padding:16px;
+    background:var(--tint);
+    border-radius:6px;
+}
+
+.loan-values small {
+    font-size:8px;
+    letter-spacing:.6px;
+    display:block;
+    margin-bottom:7px;
+}
+
+.loan-values strong {
+    font-size:20px;
+    font-family:Consolas,monospace;
+    display:block;
+    font-weight:500;
+}
+

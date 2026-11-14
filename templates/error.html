@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<main class="error-card">
+<img class="error-logo" src="{{ url_for('static', filename='images/credisol-logo.svg') }}" alt="CREDISOL, Crédito Solidario">
+<p class="eyebrow mt-4">CUOTIX · {{ code }}</p>
+<h1>No pudimos completar esta solicitud</h1>
+<p>{{ error }}</p>
+<a href="{{ url_for('home') }}" class="btn btn-primary">Volver al inicio</a>
+<a href="{{ url_for('login') }}" class="btn btn-light ms-2">Acceder</a>
+</main>
+{% endblock %}

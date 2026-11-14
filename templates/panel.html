@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+<script defer src="{{ url_for('static', filename='js/tablas.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<a class="skip-link" href="#main">Saltar al contenido</a>
+{% include "_menu.html" %}
+<div class="workspace">
+{% include "_encabezado.html" %}
+<main id="main" class="main-content {{ 'cash-inventory-print' if page == 'caja' else '' }}">
+{% if admin.get('temporal') %}
+<div class="alert alert-warning small" role="status">Acceso local temporal sin inicio de sesión. Las operaciones usan los datos reales de Firebase.</div>
+{% endif %}
+<div class="page-heading">
+<div>
+<div class="breadcrumb-line">CUOTIX NI <span>/ CONTROL CENTRAL /</span> {{ page|upper }}</div>
+<h1>{{ titles.get(page) }}</h1>
+<p>{% if page == 'monitor' %}Supervisión de recaudación en campo y cartera activa de microcréditos.{% elif page == 'cobradores' %}Gestiona tu equipo, sus accesos y la asignación de cartera.{% elif page == 'caja' %}Control de entregas, conteo físico y custodia de fondos.{% elif page == 'clientes' %}Consulta de créditos, amortización y pagos registrados por cliente.{% elif page == 'reportes' %}Una visión de la colocación, la cobranza y el rendimiento de tu equipo.{% elif page == 'apariencia' %}Personaliza los colores del panel en este navegador.{% else %}Últimas 100 acciones realizadas desde este panel.{% endif %}</p>
+</div>
+<div class="heading-actions">{% if page == 'cobradores' %}<a class="btn btn-light" href="/auditoria">{{ icon('clock') }} Log de auditoría</a>{% elif page not in ['auditoria', 'apariencia'] %}<button class="btn btn-light" type="button" data-print>{{ icon('print') }} Imprimir / PDF</button>
+<a class="btn btn-primary" href="{{ url_for('export', collection='clientes' if page == 'clientes' else 'movimientosCaja' if page == 'caja' else 'facturas', desde=start, hasta=end, cobrador=collector) }}">{{ icon('download') }} Exportar CSV</a>{% endif %}</div>
+</div>
+
+{% block page_content %}{% endblock %}
+<footer class="app-footer">
+<span>CUOTIX · Panel Administrativo</span>
+<span>{{ icon('shield') }} Acceso exclusivo para administradores</span>
+</footer>
+</main>
+</div>
+{% endblock %}

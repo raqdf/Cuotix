@@ -1,0 +1,117 @@
+:root[data-palette="azul"] {
+    --blue:#0753df;
+    --navy:#141d2e;
+    --bg:#f6f8fe;
+    --tint:#eef3ff;
+    --line:#e9eef8;
+    --accent-dark:#0344bc;
+    --accent-soft:#edf4ff;
+    --accent-border:#2875ff;
+    --accent-ring:#0753df30;
+    --input-bg:#f2f5ff;
+    --table-head:#eff4ff;
+    --table-hover:#f9fbff;
+    --avatar-bg:#dce8ff;
+    --avatar-color:#104dc1;
+    --badge-bg:#eaf0ff;
+    --badge-ink:#42516a;
+    --bs-primary:#0753df;
+    --bs-body-bg:var(--bg);
+}
+
+:root[data-palette="verde"] {
+    --blue:#11856b;
+    --navy:#17352f;
+    --bg:#f3faf6;
+    --tint:#e7f4ec;
+    --line:#dcebe1;
+    --accent-dark:#08674f;
+    --accent-soft:#eaf6ef;
+    --accent-border:#82c9a8;
+    --accent-ring:#11856b30;
+    --input-bg:#f8fcf9;
+    --table-head:#eaf5ee;
+    --table-hover:#f3faf5;
+    --avatar-bg:#d6eee1;
+    --avatar-color:#17694f;
+    --badge-bg:#e7f4ec;
+    --badge-ink:#285945;
+    --bs-primary:#11856b;
+    --bs-body-bg:var(--bg);
+}
+
+.palette-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:14px;
+    padding:0 20px 20px;
+}
+
+.palette-option {
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:7px;
+    width:100%;
+    padding:14px;
+    border:2px solid var(--line);
+    border-radius:9px;
+    background:var(--surface);
+    color:var(--ink);
+    text-align:left;
+    cursor:pointer;
+    transition:border-color .15s,box-shadow .15s,transform .15s;
+}
+
+.palette-option:hover {
+    border-color:var(--accent-border);
+    transform:translateY(-1px);
+}
+
+.palette-option[aria-pressed="true"] {
+    border-color:var(--blue);
+    box-shadow:0 0 0 3px var(--accent-ring);
+}
+
+.palette-option strong {
+    font-size:13px;
+}
+
+.palette-option>span:last-child,.palette-status {
+    color:var(--muted);
+    font-size:11px;
+}
+
+.palette-preview {
+    display:flex;
+    width:100%;
+    height:42px;
+    margin-bottom:5px;
+    overflow:hidden;
+    border-radius:5px;
+}
+
+.palette-preview i {
+    flex:1;
+}
+
+.swatch-orange {background:#c2410c}
+.swatch-yellow {background:#f4bd52}
+.swatch-brown {background:#3b2818}
+.swatch-blue {background:#0753df}
+.swatch-sky {background:#eef3ff}
+.swatch-navy {background:#141d2e}
+.swatch-green {background:#11856b}
+.swatch-mint {background:#e7f4ec}
+.swatch-forest {background:#17352f}
+
+.palette-status {
+    min-height:20px;
+    margin:0 20px 16px;
+}
+
+@media(max-width:600px) {
+    .palette-grid {
+        grid-template-columns:1fr;
+    }
+}

@@ -1,0 +1,32 @@
+{% extends "panel.html" %}
+
+{% block page_content %}
+<section class="card-panel">
+<div class="table-responsive">
+<table class="table data-table" data-paginate="12">
+<thead>
+<tr>
+<th>Fecha</th>
+<th>Acción</th>
+<th>Administrador</th>
+<th>Detalle</th>
+</tr>
+</thead>
+<tbody>{% for r in records %}<tr>
+<td>{{ r.get('fecha')|datefmt }}</td>
+<td>{{ r.get('accion', '') }}</td>
+<td class="mono">{{ r.get('adminId', '') }}</td>
+<td>
+<details>
+<summary>Ver detalle</summary>
+<dl>{% for k,v in r.get('detalle', {}).items() %}<dt>{{ k }}</dt>
+<dd>{{ v }}</dd>{% endfor %}</dl>
+</details>
+</td>
+</tr>{% else %}<tr>
+<td colspan="4">{{ empty('No hay acciones administrativas registradas.') }}</td>
+</tr>{% endfor %}</tbody>
+</table>
+</div>
+</section>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% macro icon(name, cls='') %}<svg class="icon {{ cls }}" aria-hidden="true">
+<use href="#{{ name }}"/>
+</svg>{% endmacro %}
+{% macro csrf() %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endmacro %}
+{% macro empty(text='No hay registros para esta selección.') %}<div class="empty">{{ icon('folder') }}<strong>{{ text }}</strong>
+<span>Los datos aparecerán aquí cuando estén registrados.</span>
+</div>{% endmacro %}
+{% macro stat(label, value, sub, symbol='wallet', danger=false) %}
+<div class="metric {{ 'metric-danger' if danger }}">
+<div class="metric-label">{{ label }}<span class="icon-tile">{{ icon(symbol) }}</span>
+</div>
+<div class="metric-value">{{ value }}</div>
+<div class="metric-foot">{{ sub }}</div>
+</div>
+{% endmacro %}
+{% macro receipts_table(rows, detail=false) %}
+<div class="table-responsive">
+<table class="table align-middle data-table" data-paginate="8">
+<thead>
+<tr>
+<th>Fecha / Recibo</th>
+<th>Cliente</th>
+<th>Cobrador</th>
+<th>Método</th>
+<th>Concepto</th>
+<th class="text-end">Monto</th>{% if detail %}<th class="text-end">Saldo resultante</th>{% endif %}</tr>
+</thead>
+<tbody>
+{% for r in rows %}<tr>
+<td>
+<span class="mono">{{ r.get('fecha')|datefmt }}</span>
+<small class="text-primary">{{ r.get('numeroFactura', r.id) }}</small>
+</td>
+<td>
+<a href="{{ url_for('panel', page='clientes', cliente=r.cliente_id) }}">{{ r.cliente }}</a>
+</td>
+<td>
+<span class="dot">
+</span>{{ r.cobrador }}</td>
+<td>
+<span class="tag">{{ r.get('metodoPago', r.get('tipoPago', 'Sin dato')) }}</span>
+</td>
+<td>{{ r.get('concepto', 'Pago registrado') }}</td>
+<td class="text-end mono fw-semibold">{{ receipt_amount(r)|money }}</td>{% if detail %}<td class="text-end mono">{{ r.get('saldoFinal', r.get('saldoActual', 0))|money }}</td>{% endif %}</tr>
+{% else %}<tr>
+<td colspan="{{ 7 if detail else 6 }}">{{ empty('No hay cobros en esta selección.') }}</td>
+</tr>{% endfor %}
+</tbody>
+</table>
+</div>
+{% endmacro %}

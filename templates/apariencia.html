@@ -1,0 +1,30 @@
+{% extends "panel.html" %}
+
+{% block page_content %}
+<section class="card-panel palette-page">
+<div class="section-heading">
+<div>
+<h2>{{ icon('palette') }} Paleta del panel</h2>
+<p>Elige los colores que prefieres. La selección se guarda en este navegador.</p>
+</div>
+</div>
+<div class="palette-grid">
+<button class="palette-option" type="button" data-palette-choice="naranja" aria-pressed="false">
+<span class="palette-preview" aria-hidden="true"><i class="swatch-orange"></i><i class="swatch-yellow"></i><i class="swatch-brown"></i></span>
+<strong>Naranja y amarillo</strong>
+<span>La nueva paleta de Cuotix</span>
+</button>
+<button class="palette-option" type="button" data-palette-choice="azul" aria-pressed="false">
+<span class="palette-preview" aria-hidden="true"><i class="swatch-blue"></i><i class="swatch-sky"></i><i class="swatch-navy"></i></span>
+<strong>Azul corporativo</strong>
+<span>La paleta azul anterior</span>
+</button>
+<button class="palette-option" type="button" data-palette-choice="verde" aria-pressed="false">
+<span class="palette-preview" aria-hidden="true"><i class="swatch-green"></i><i class="swatch-mint"></i><i class="swatch-forest"></i></span>
+<strong>Verde y menta</strong>
+<span>Una alternativa fresca</span>
+</button>
+</div>
+<p class="palette-status" role="status" aria-live="polite" data-palette-status></p>
+</section>
+{% endblock %}

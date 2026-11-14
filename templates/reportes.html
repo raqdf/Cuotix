@@ -1,0 +1,92 @@
+{% extends "panel.html" %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/graficos.css') }}">
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script defer src="{{ url_for('static', filename='js/graficos.js') }}"></script>
+{% endblock %}
+
+{% block page_content %}
+{% include "_filtros_cobros.html" %}
+<div class="content-grid">
+<section class="card-panel">
+<div class="section-heading">
+<div>
+<div class="eyebrow">RENDIMIENTO OPERATIVO</div>
+<h2>Evaluación de Cobradores en Campo</h2>
+</div>
+</div>
+<div class="table-responsive">
+<table class="table data-table align-middle" data-paginate="8">
+<thead>
+<tr>
+<th>Cobrador</th>
+<th>Cartera asignada</th>
+<th>Cobrado en período</th>
+<th>Créditos con saldo</th>
+<th>Estado</th>
+</tr>
+</thead>
+<tbody>{% for u in data.cobradores if not collector or u.id == collector %}<tr>
+<td>
+<strong>{{ u.nombre }}</strong>
+<small>{{ u.get('ruta') or 'Sin ruta' }}</small>
+</td>
+<td class="mono">{{ u.cartera|money }}</td>
+<td class="mono text-primary">{{ u.cobrado|money }}</td>
+<td>{{ u.contratos }}</td>
+<td>
+<span class="tag {{ 'good' if u.activo else 'bad' }}">{{ 'Activo' if u.activo else u.get('estado') }}</span>
+</td>
+</tr>{% else %}<tr>
+<td colspan="5">{{ empty() }}</td>
+</tr>{% endfor %}</tbody>
+</table>
+</div>
+<div class="panel-note">Cobranza calculada a partir de recibos; incluye capital e intereses.</div>
+</section>
+<section class="card-panel">
+<div class="section-heading">
+<div>
+<div class="eyebrow">DISTRIBUCIÓN DE SALDOS</div>
+<h2>Estructura de la Cartera</h2>
+</div>
+</div>
+<div class="padded text-center">
+<div class="donut" style="--overdue: {{ [100, stats.overdue_rate]|min }}%">
+<div>
+<strong>{{ '%.1f'|format(stats.overdue_rate) }}%</strong>
+<small>SALDO VENCIDO</small>
+</div>
+</div>
+<div class="legend-row">
+<span>
+<i class="dot">
+</i> Saldo no vencido</span>
+<strong class="mono">{{ (stats.portfolio - stats.overdue)|money }}</strong>
+</div>
+<div class="legend-row">
+<span>
+<i class="dot red">
+</i> Cuotas vencidas</span>
+<strong class="mono text-danger">{{ stats.overdue|money }}</strong>
+</div>
+<p class="small text-secondary mt-3">Vencido: cuotas con saldo y fecha anterior a hoy. No equivale a una calificación de riesgo.</p>
+</div>
+</section>
+</div>
+<section class="card-panel mt-4">
+<div class="section-heading">
+<h2>{{ icon('chart') }} Evolución de la cobranza · últimos 7 días</h2>
+</div>
+<div class="trend-chart" data-trend='{{ trend|tojson }}'>
+</div>
+</section>
+<section class="card-panel mt-4">
+<div class="section-heading">
+<h2>Detalle de recibos del período</h2>
+</div>{{ receipts_table(receipts) }}</section>
+{% endblock %}

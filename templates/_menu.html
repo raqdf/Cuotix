@@ -1,0 +1,24 @@
+<aside class="sidebar" id="sidebar">
+<a class="brand" href="/">
+<img class="brand-logo" src="{{ url_for('static', filename='images/credisol-logo-inverse.svg') }}" alt="CREDISOL, Crédito Solidario">
+<span class="brand-product">CUOTIX<small>PLATAFORMA ADMINISTRATIVA</small>
+</span>
+</a>
+<div class="nav-label">MÓDULOS OPERATIVOS</div>
+<nav aria-label="Navegación principal">{% for key, href, symbol, label in nav %}<a href="{{ href }}" class="nav-item {{ 'active' if page == key }}" {% if page == key %}aria-current="page"{% endif %}>{{ icon(symbol) }}<span>{{ label }}</span>
+</a>{% endfor %}</nav>
+<div class="sidebar-bottom">
+<div class="network-box">
+<div>Administración central <span class="tag good">● Activa</span>
+</div>
+<strong>Juigalpa, Chontales</strong>
+<small>Hora local · UTC −06:00</small>
+</div>
+{% if admin.get('temporal') %}
+<div class="logout">{{ icon('lock') }} Acceso local temporal</div>
+{% else %}
+<form method="post" action="{{ url_for('logout') }}">{{ csrf() }}<button class="logout">{{ icon('exit') }} Cerrar sesión</button>
+</form>
+{% endif %}
+</div>
+</aside>

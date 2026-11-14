@@ -1,0 +1,150 @@
+{% extends "panel.html" %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/clientes.css') }}">
+{% endblock %}
+
+{% block page_content %}
+<form method="get" class="filterbar card-panel">
+<div class="flex-grow-1">
+<label for="clientSearch">Nombre o cédula de identidad</label>
+<input id="clientSearch" class="form-control" name="q" value="{{ q }}" placeholder="Buscar expediente…">
+</div>
+<button class="btn btn-primary">{{ icon('search') }} Consultar expediente</button>
+<a class="btn btn-light" href="/clientes">Ver todos</a>
+</form>
+<div class="client-tabs">{% for c in clients %}<a class="tag {{ 'selected' if selected and c.id == selected.id }}" href="{{ url_for('panel', page='clientes', cliente=c.id, q=q) }}">{{ c.nombre }}</a>{% endfor %}</div>
+{% if selected %}
+<div class="client-summary">
+<section class="card-panel padded">
+<div class="person">
+<span class="avatar large">{{ selected.nombre[:2]|upper }}</span>
+<div>
+<h2>{{ selected.nombre }}</h2>
+<span class="mono small">{{ selected.get('cedula', 'Sin cédula') }}</span>
+</div>
+</div>
+<div class="tint p-3 mt-4">
+<div class="detail-label">TELÉFONO MÓVIL</div>
+<p>{{ selected.get('numero', 'Sin registrar') }}</p>
+<div class="detail-label">DIRECCIÓN DOMICILIARIA</div>
+<p class="mb-0">{{ selected.get('direccion', 'Sin registrar') }}</p>
+</div>
+</section>
+<section class="card-panel padded">
+<div class="eyebrow">RELACIÓN CON CUOTIX</div>
+<h2 class="mt-2">Perfil del cliente</h2>
+<div class="detail-row">
+<span>Fecha de registro</span>
+<strong>{{ selected.get('fecha_Creacion', selected.get('fechaCreacion'))|datefmt('%d/%m/%Y') }}</strong>
+</div>
+<div class="detail-row">
+<span>Cobrador</span>
+<strong>{{ selected.cobrador }}</strong>
+</div>
+{% if active_collectors %}
+<form class="mt-3" method="post" action="{{ url_for('assign_client_collector', client_id=selected.id) }}" data-confirm="¿Confirmas asignar este cliente y sus créditos y cuotas vinculados al cobrador seleccionado? Los recibos históricos no cambiarán.">
+{{ csrf() }}
+<label class="form-label w-100" for="client-collector">Asignar o cambiar cobrador</label>
+<select class="form-select" id="client-collector" name="cobrador" required>
+<option value="" selected disabled>Selecciona un cobrador activo</option>
+{% for collector in active_collectors %}<option value="{{ collector.id }}">{{ collector.nombre }}</option>{% endfor %}
+</select>
+<button class="btn btn-outline-primary btn-sm mt-2">Asignar cliente y cartera</button>
+<p class="small text-secondary mt-2 mb-0">También actualiza sus créditos y cuotas vinculados. Los recibos históricos conservan su cobrador.</p>
+</form>
+{% else %}
+<p class="small text-warning mt-3">No hay cobradores activos. Crea o reactiva uno antes de asignar este cliente.</p>
+{% endif %}
+<div class="detail-row">
+<span>Estado</span>
+<span class="tag {{ 'good' if selected.get('estado') in [true, 'activo'] else '' }}">{{ 'Activo' if selected.get('estado') in [true, 'activo'] else selected.get('estado', 'Sin dato') }}</span>
+</div>
+<p class="small text-secondary mt-3">La calificación crediticia no está registrada. No se asigna un score automático.</p>
+</section>
+<section class="card-panel padded">
+<div class="eyebrow">RESUMEN DE CARTERA</div>
+<div class="detail-label mt-4">CAPITAL PRESTADO</div>
+<div class="metric-value">{% set capital = namespace(total=0, saldo=0) %}{% for c in client_credits %}{% set capital.total = capital.total + number(c.get('monto')) %}{% set capital.saldo = capital.saldo + number(c.get('saldoPendiente')) %}{% endfor %}{{ capital.total|money }}</div>
+<div class="detail-row">
+<span>Créditos registrados</span>
+<strong>{{ client_credits|length }}</strong>
+</div>
+<div class="detail-row">
+<span>Saldo pendiente</span>
+<strong class="mono text-primary">{{ capital.saldo|money }}</strong>
+</div>
+</section>
+</div>
+{% for c in client_credits %}<section class="card-panel credit-card mt-4">
+<div class="section-heading">
+<h2>Crédito <span class="mono">{{ c.get('codigo', c.id) }}</span>
+</h2>
+<span class="tag {{ 'good' if number(c.get('saldoPendiente')) == 0 else '' }}">{{ c.get('estado', 'Sin estado')|capitalize }}</span>
+</div>
+<div class="padded pt-0">
+<p class="small text-secondary">{{ c.get('fechaCreacion')|datefmt('%d/%m/%Y') }} · Cobrador: {{ c.cobrador }} · Frecuencia: {{ c.get('frecuenciaPago', 'Sin dato') }}</p>
+<div class="loan-values">
+<div>
+<small>MONTO ORIGINAL</small>
+<strong>{{ c.get('monto')|money }}</strong>
+</div>
+<div>
+<small>TOTAL A PAGAR</small>
+<strong>{{ c.get('montoTotal')|money }}</strong>
+</div>
+<div>
+<small>SALDO RESTANTE</small>
+<strong class="text-primary">{{ c.get('saldoPendiente')|money }}</strong>
+</div>
+<div>
+<small>TASA DE INTERÉS</small>
+<strong>{{ c.get('tasaInteres', 'Sin dato') }}{{ '%' if '%' not in c.get('tasaInteres', '')|string and c.get('tasaInteres') is not none else '' }}</strong>
+</div>
+</div>
+{% set total = number(c.get('montoTotal')) %}{% set progress = [100, [0, ((total - number(c.get('saldoPendiente'))) / total * 100) if total else 0]|max]|min %}<div class="d-flex justify-content-between small mt-4 mb-2">
+<strong>Amortización del total</strong>
+<span>{{ '%.1f'|format(progress) }}%</span>
+</div>
+<div class="progress">
+<div class="progress-bar" style="width:{{ progress }}%">
+</div>
+</div>
+<details class="mt-4">
+<summary>Ver calendario de cuotas</summary>
+<div class="table-responsive mt-3">
+<table class="table data-table">
+<thead>
+<tr>
+<th>Cuota</th>
+<th>Vencimiento</th>
+<th>Monto</th>
+<th>Pagado</th>
+<th>Saldo</th>
+<th>Estado</th>
+</tr>
+</thead>
+<tbody>{% for quota in data.cuotas|sort(attribute='numeroCuota') if ref_id(quota.get('creditoId')) == c.id %}<tr>
+<td>{{ quota.get('numeroCuota', '—') }}</td>
+<td>{{ quota.get('fechaVencimiento')|datefmt('%d/%m/%Y') }}</td>
+<td>{{ quota.get('montoCuota')|money }}</td>
+<td>{{ quota.get('montoPagado')|money }}</td>
+<td>{{ quota.get('saldoPendiente')|money }}</td>
+<td>{{ quota.get('estado', 'Sin dato') }}</td>
+</tr>{% else %}<tr>
+<td colspan="6">No hay cuotas vinculadas.</td>
+</tr>{% endfor %}</tbody>
+</table>
+</div>
+</details>
+</div>
+</section>{% else %}<section class="card-panel mt-4">{{ empty('Este cliente no tiene créditos vinculados.') }}</section>{% endfor %}
+<section class="card-panel mt-4">
+<div class="section-heading">
+<div>
+<h2>Auditoría Transaccional y Recibos</h2>
+<p>Todos los recibos confirmados de este cliente</p>
+</div>
+</div>{{ receipts_table(client_receipts, true) }}</section>
+{% else %}<section class="card-panel">{{ empty('No encontramos clientes con esos datos.') }}</section>{% endif %}
+{% endblock %}

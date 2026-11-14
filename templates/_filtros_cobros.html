@@ -1,0 +1,31 @@
+<form class="filterbar card-panel" method="get">
+<div>
+<label for="desde">Desde</label>
+<input id="desde" type="date" name="desde" value="{{ start }}" required class="form-control">
+</div>
+<div>
+<label for="hasta">Hasta</label>
+<input id="hasta" type="date" name="hasta" value="{{ end }}" required class="form-control">
+</div>
+<div class="flex-grow-1">
+<label for="collector">Cobrador</label>
+<select id="collector" name="cobrador" class="form-select">
+<option value="">Todos los cobradores</option>{% for u in data.cobradores %}<option value="{{ u.id }}" {% if collector == u.id %}selected{% endif %}>{{ u.nombre }}</option>{% endfor %}</select>
+</div>
+<button class="btn btn-primary">Aplicar filtros</button>
+<a href="{{ '/' if page == 'monitor' else '/reportes' }}" class="btn btn-light">Limpiar</a>
+</form>
+<div class="status-strip">
+<span>
+<i class="dot green">
+</i> Consulta completada <span class="mono">{{ updated|datefmt }}</span>
+</span>
+<span>Hora de Nicaragua <button class="link-button" data-refresh>{{ icon('refresh') }} Actualizar datos</button>
+</span>
+</div>
+<div class="metrics-grid">
+{{ stat('RECAUDACIÓN DEL DÍA' if page == 'monitor' else 'RECAUDACIÓN DEL PERÍODO', (stats.today if page == 'monitor' else stats.collected)|money, (stats.today_count if page == 'monitor' else stats.count)|string + ' recibos registrados', 'wallet') }}
+{{ stat('CARTERA PENDIENTE', stats.portfolio|money, stats.active_credits|string + ' créditos con saldo', 'folder') }}
+{{ stat('COBROS EN EL PERÍODO' if page == 'monitor' else 'CAPITAL COLOCADO EN EL PERÍODO', stats.count if page == 'monitor' else stats.placed|money, start|string + ' — ' + end|string, 'grid') }}
+{{ stat('CUOTAS VENCIDAS / ALERTA', stats.overdue|money, stats.overdue_count|string + ' cuotas con saldo vencido', 'alert', true) }}
+</div>

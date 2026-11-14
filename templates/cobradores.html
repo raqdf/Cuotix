@@ -1,0 +1,160 @@
+{% extends "panel.html" %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/cobradores.css') }}">
+{% endblock %}
+
+{% block page_content %}
+<div class="metrics-grid">{{ stat('TOTAL PERSONAL REGISTRADO', data.usuarios|length, 'Usuarios en Cuotix', 'people') }}{{ stat('COBRADORES ACTIVOS', data.cobradores|selectattr('activo')|list|length, 'Acceso habilitado en el registro', 'shield') }}{{ stat('PERSONAL INACTIVO O BANEADO', data.usuarios|rejectattr('activo')|list|length, 'Acceso deshabilitado o bloqueado', 'lock', true) }}{{ stat('CARTERA PENDIENTE', stats.portfolio|money, 'Saldo total de créditos', 'folder') }}</div>
+<form class="filterbar card-panel" method="get">
+<div class="flex-grow-1">
+<label for="userSearch">Buscar personal</label>
+<input class="form-control" id="userSearch" name="q" value="{{ q }}" placeholder="Nombre, cédula o identificador">
+</div>
+<div>
+<label for="state">Estado</label>
+<select id="state" name="estado" class="form-select">
+<option value="">Todos los estados</option>
+<option value="activo" {% if request.args.get('estado') == 'activo' %}selected{% endif %}>Activos</option>
+<option value="inactivo" {% if request.args.get('estado') == 'inactivo' %}selected{% endif %}>Inactivos</option>
+<option value="baneado" {% if request.args.get('estado') == 'baneado' %}selected{% endif %}>Baneados</option>
+</select>
+</div>
+<button class="btn btn-primary">Buscar</button>
+<a href="/cobradores" class="btn btn-light">Limpiar</a>
+</form>
+<section class="card-panel">
+<div class="section-heading tint">
+<div>
+<h2>{{ icon('people') }} Personal & Accesos</h2>
+<span class="small">{{ users|length }} usuarios</span>
+</div>
+<button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#createUser">＋ Nuevo cobrador</button>
+</div>
+<div class="table-responsive">
+<table class="table data-table align-middle" data-paginate="8">
+<thead>
+<tr>
+<th>Código & Usuario</th>
+<th>Cédula & Contacto</th>
+<th>Cartera asignada</th>
+<th>Estado</th>
+<th>Alta</th>
+<th>Acciones</th>
+</tr>
+</thead>
+<tbody>
+{% for u in users %}<tr>
+<td>
+<div class="person">
+<span class="avatar">{{ u.nombre[:2]|upper }}</span>
+<div>
+<strong>{{ u.nombre }}</strong>
+<span class="role">{{ u.get('rol', 'Sin rol') }}</span>
+<small class="mono id-text">{{ u.id }}</small>
+</div>
+</div>
+</td>
+<td>{{ u.get('cedula', 'Sin cédula') }}<small>{{ u.get('numero', 'Sin teléfono') }}</small>
+</td>
+<td class="mono">{{ u.cartera|money }}<small>{{ u.contratos }} créditos · {{ u.get('ruta') or 'Sin ruta' }}</small>
+</td>
+<td>
+{% set estado = u.get('estado', '')|lower %}
+<span class="tag {{ 'good' if u.activo else 'bad' }}">{{ 'Activo' if u.activo else 'Baneado' if estado == 'baneado' else 'Inactivo' if estado in ['deshabilitado', 'inactivo', 'pendiente'] else estado|capitalize }}</span>{% if u.get('estadoSolicitado') %}<small>Pendiente: {{ u.estadoSolicitado }}</small>{% endif %}</td>
+<td>{{ u.get('fecha_Creacion', u.get('fechaCreacion'))|datefmt('%d/%m/%Y') }}</td>
+<td>{% if u.get('rol', '')|lower == 'cobrador' %}<button class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#edit-{{ loop.index }}">Editar</button>
+<button class="btn btn-sm btn-outline-primary mt-1" data-bs-toggle="modal" data-bs-target="#state-{{ loop.index }}">Acceso</button>{% else %}<span class="small text-secondary">Administrador</span>{% endif %}</td>
+</tr>
+{% else %}<tr>
+<td colspan="6">{{ empty('No hay usuarios que coincidan.') }}</td>
+</tr>{% endfor %}</tbody>
+</table>
+</div>
+</section>
+<div class="protocol card-panel mt-4">{{ icon('shield') }}<div>
+<h2>Reasignación de cartera antes de una baja</h2>
+<p>Para deshabilitar un cobrador con clientes o créditos asignados, selecciona otro cobrador activo. La operación queda registrada en auditoría.</p>
+</div>
+<a href="/auditoria" class="btn btn-light">Ver auditoría</a>
+</div>
+<div class="modal fade" id="createUser" tabindex="-1" aria-labelledby="createTitle">
+<div class="modal-dialog modal-lg">
+<form class="modal-content" method="post" action="/cobradores/crear">{{ csrf() }}<div class="modal-header">
+<h2 id="createTitle" class="modal-title">Nuevo cobrador</h2>
+<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
+</button>
+</div>
+<div class="modal-body">
+<p class="text-secondary">Crea el acceso y el perfil de tu nuevo colaborador.</p>
+<div class="row g-3">{% for field, label, type in [('nombres','Nombres','text'), ('apellidos','Apellidos','text'), ('cedula','Cédula','text'), ('numero','Teléfono','tel'), ('email','Correo electrónico','email'), ('password','Contraseña temporal','password'), ('ruta','Ruta asignada','text'), ('metaDiaria','Meta diaria (C$)','number')] %}<div class="col-md-6">
+<label for="new-{{ field }}" class="form-label">{{ label }}</label>
+<input id="new-{{ field }}" name="{{ field }}" type="{{ type }}" class="form-control" {% if field not in ['ruta', 'metaDiaria'] %}required{% endif %} {% if type == 'number' %}min="0" max="1000000000" step=".01" value="0"{% elif type == 'password' %}minlength="8" autocomplete="new-password"{% else %}maxlength="150"{% endif %}>
+</div>{% endfor %}</div>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+<button class="btn btn-primary">Crear cobrador</button>
+</div>
+</form>
+</div>
+</div>
+{% for u in users %}{% if u.get('rol', '')|lower == 'cobrador' %}
+<div class="modal fade" id="edit-{{ loop.index }}" tabindex="-1" aria-label="Editar cobrador">
+<div class="modal-dialog modal-lg">
+<form class="modal-content" method="post" action="{{ url_for('edit_collector', uid=u.id) }}">{{ csrf() }}<div class="modal-header">
+<h2 class="modal-title">Editar · {{ u.nombre }}</h2>
+<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
+</button>
+</div>
+<div class="modal-body">
+<div class="row g-3">{% for field, label in [('nombres','Nombres'), ('apellidos','Apellidos'), ('cedula','Cédula'), ('numero','Teléfono'), ('ruta','Ruta'), ('metaDiaria','Meta diaria (C$)')] %}<div class="col-md-6">
+<label class="form-label" for="edit-{{ u.id }}-{{ field }}">{{ label }}</label>
+<input id="edit-{{ u.id }}-{{ field }}" class="form-control" name="{{ field }}" value="{{ u.get(field, 0 if field == 'metaDiaria' else '') }}" {% if field == 'metaDiaria' %}type="number" min="0" max="1000000000" step=".01"{% else %}maxlength="150"{% endif %} {% if field != 'ruta' %}required{% endif %}>
+</div>{% endfor %}</div>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+<button class="btn btn-primary">Guardar cambios</button>
+</div>
+</form>
+</div>
+</div>
+<div class="modal fade" id="state-{{ loop.index }}" tabindex="-1" aria-label="Cambiar acceso">
+<div class="modal-dialog">
+<form class="modal-content" method="post" action="{{ url_for('collector_status', uid=u.id) }}" data-confirm="¿Confirmas el cambio de acceso y la reasignación indicada?">{{ csrf() }}<div class="modal-header">
+<h2 class="modal-title">Control de acceso</h2>
+<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
+</button>
+</div>
+<div class="modal-body">
+<div class="tint p-3 mb-3">
+<strong>{{ u.nombre }}</strong>
+<div>Cartera: {{ u.cartera|money }}</div>
+</div>
+<label class="form-label">Nuevo estado<select class="form-select" name="estado" required>
+<option value="deshabilitado">Inactivo</option>
+<option value="baneado">Baneado (despedido)</option>
+<option value="activo">Activo (reactivar)</option>
+</select>
+</label>
+{% set destinos = data.cobradores|selectattr('activo')|rejectattr('id', 'equalto', u.id)|list %}
+<label class="form-label w-100">Reasignar cartera a<select class="form-select" name="destino">
+<option value="">Selecciona un cobrador</option>{% for dest in destinos %}<option value="{{ dest.id }}">{{ dest.nombre }}</option>{% endfor %}</select>
+</label>
+{% if not destinos %}<p class="small text-warning">No hay otro cobrador activo. Si este empleado tiene cartera asignada, crea o reactiva otro antes de inactivarlo o banearlo.</p>{% endif %}
+<p class="small text-secondary">Obligatorio para una baja si hay cartera asignada. Los recibos históricos mantienen su autor.</p>
+<label class="form-label w-100">Motivo<textarea class="form-control" name="motivo" required maxlength="500">
+</textarea>
+</label>
+<p class="small text-secondary">Al banear, se bloquea la cuenta en Firebase Authentication y se revocan sus sesiones. Si tiene cartera, reasígnala a otro cobrador activo.</p>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+<button class="btn btn-danger">Confirmar cambio de acceso</button>
+</div>
+</form>
+</div>
+</div>
+{% endif %}{% endfor %}
+{% endblock %}

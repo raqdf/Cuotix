@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="access-shell">
+<div class="access-card">
+<section class="access-brand">
+<div class="brand-large">
+<img class="brand-large-logo" src="{{ url_for('static', filename='images/credisol-logo-inverse.svg') }}" alt="CREDISOL, Crédito Solidario">
+<div class="brand-product">CUOTIX <span class="pro">ADMIN</span>
+<small>Alta inicial segura</small>
+</div>
+</div>
+<div class="overline">CONFIGURACIÓN INICIAL</div>
+<h1>Crea la cuenta administradora</h1>
+<p>Este registro solo funciona desde esta computadora, una sola vez y antes de que exista un administrador.</p>
+<div class="access-note">{{ icon('shield') }} El alta inicial no está disponible desde Internet.</div>
+</section>
+<section class="access-form">
+<span class="eyebrow">PRIMER ACCESO</span>
+<h2>Crear administrador</h2>
+<p class="text-secondary">Completa los datos de la primera cuenta con acceso al panel.</p>
+{% if not configured %}
+<div class="alert alert-warning small">Configura Firebase Admin en el servidor antes de crear la cuenta.</div>
+{% endif %}
+{% if not login_configured and not local_login_configured %}
+<div class="alert alert-warning small">Para iniciar sesión configura FIREBASE_WEB_API_KEY o LOCAL_ADMIN_EMAIL y LOCAL_ADMIN_PASSWORD en .env.</div>
+{% endif %}
+<form method="post" action="{{ url_for('register_admin') }}">
+{{ csrf() }}
+<label class="form-label" for="nombres">Nombres</label>
+<input class="form-control mb-3" id="nombres" name="nombres" autocomplete="given-name" required maxlength="100">
+<label class="form-label" for="apellidos">Apellidos</label>
+<input class="form-control mb-3" id="apellidos" name="apellidos" autocomplete="family-name" required maxlength="100">
+<label class="form-label" for="email">Correo electrónico</label>
+<input class="form-control mb-3" type="email" id="email" name="email" autocomplete="email" required maxlength="150">
+<label class="form-label" for="password">Contraseña (mínimo 12 caracteres)</label>
+<input class="form-control mb-3" type="password" id="password" name="password" autocomplete="new-password" required minlength="12" maxlength="128">
+<label class="form-label" for="password_confirm">Confirmar contraseña</label>
+<input class="form-control mb-3" type="password" id="password_confirm" name="password_confirm" autocomplete="new-password" required minlength="12" maxlength="128">
+<button class="btn btn-primary w-100 btn-login" {% if not configured %}disabled{% endif %}>Crear cuenta administradora</button>
+</form>
+<a class="btn btn-light w-100 mt-3" href="{{ url_for('login') }}">Volver al inicio de sesión</a>
+</section>
+</div>
+</main>
+{% endblock %}

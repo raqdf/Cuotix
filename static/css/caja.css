@@ -1,0 +1,298 @@
+/* Cuotix: caja. */
+.cash-toolbar {
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:18px;
+}
+
+.cash-grid {
+    display:grid;
+    grid-template-columns:minmax(300px,1fr) minmax(0,1.45fr);
+    gap:22px;
+    align-items:start;
+}
+
+.count-head,.count-row {
+    display:grid;
+    grid-template-columns:1.2fr 80px 1fr;
+    align-items:center;
+    gap:12px;
+}
+
+.count-head {
+    font-size:9px;
+    background:var(--tint);
+    padding:12px 8px;
+}
+
+.count-row {
+    padding:11px 0;
+    border-bottom:1px solid var(--line);
+    font-size:12px;
+    transition:background-color .15s ease;
+}
+
+.count-row:focus-within {
+    background:#f7f9fd;
+}
+
+.count-row label {
+    display:flex;
+    align-items:center;
+    cursor:pointer;
+}
+
+.bill-visual {
+    display:grid;
+    justify-items:center;
+    gap:3px;
+    width:min(100%,104px);
+}
+
+.bill-photo {
+    display:block;
+    width:100%;
+    height:58px;
+    object-fit:contain;
+    border-radius:4px;
+    background:#fff;
+    box-shadow:0 3px 7px rgba(24,39,75,.14);
+    transition:transform .15s ease,box-shadow .15s ease;
+}
+
+.count-row label:hover .bill-photo {
+    transform:translateY(-2px);
+    box-shadow:0 5px 9px rgba(24,39,75,.2);
+}
+
+.bill-era {
+    color:#8a5a16;
+    font-size:8px;
+    line-height:1.2;
+    text-align:center;
+}
+
+.bill-note {
+    display:block;
+    width:min(100%,104px);
+    height:auto;
+    filter:drop-shadow(0 3px 4px rgba(24,39,75,.12));
+    transition:transform .15s ease,filter .15s ease;
+}
+
+.count-row label:hover .bill-note {
+    transform:translateY(-2px);
+    filter:drop-shadow(0 5px 6px rgba(24,39,75,.16));
+}
+
+.note-paper {
+    fill:var(--bill-paper);
+    stroke:var(--bill-ink);
+    stroke-width:1;
+}
+
+.note-frame,.note-seal,.note-seal-inner {
+    fill:none;
+    stroke:var(--bill-ink);
+}
+
+.note-frame {
+    stroke-width:.8;
+    opacity:.7;
+}
+
+.note-seal {
+    stroke-width:1;
+    opacity:.45;
+}
+
+.note-seal-inner {
+    stroke-width:.6;
+    opacity:.55;
+}
+
+.note-currency,.note-value,.note-unit {
+    fill:var(--bill-ink);
+    font-family:Arial,sans-serif;
+}
+
+.note-currency {
+    font-size:8px;
+    font-weight:700;
+    text-anchor:middle;
+}
+
+.note-value {
+    font-size:19px;
+    font-weight:700;
+}
+
+.note-unit {
+    font-size:7px;
+    font-weight:700;
+    letter-spacing:1px;
+}
+
+.bill-note-1000 {
+    --bill-paper:#e7f4e9;
+    --bill-ink:#17643b;
+}
+
+.bill-note-500 {
+    --bill-paper:#f0eafb;
+    --bill-ink:#6941a5;
+}
+
+.bill-note-200 {
+    --bill-paper:#faeade;
+    --bill-ink:#a84b28;
+}
+
+.bill-note-100 {
+    --bill-paper:#e5f0fb;
+    --bill-ink:#235b94;
+}
+
+.bill-note-50 {
+    --bill-paper:#fff2d9;
+    --bill-ink:#946016;
+}
+
+.bill-note-20 {
+    --bill-paper:#eaf3e3;
+    --bill-ink:#527b31;
+}
+
+.bill-note-10 {
+    --bill-paper:#f9e8ed;
+    --bill-ink:#a74565;
+}
+
+.bill-note-5 {
+    --bill-paper:#e2f2f1;
+    --bill-ink:#287475;
+}
+
+.bill-note-1 {
+    --bill-paper:#edf0f2;
+    --bill-ink:#4f6570;
+}
+
+.count-row output {
+    text-align:right;
+    font-size:11px;
+}
+
+.count-row input {
+    min-height:32px;
+    padding:4px 7px;
+}
+
+.bill {
+    font-family:Consolas,monospace;
+    padding:2px 4px;
+    font-size:11px;
+    display:inline-block;
+    min-width:33px;
+    background:var(--tint);
+    margin-right:4px;
+}
+
+.count-summary {
+    background:var(--tint);
+    padding:14px;
+    border-radius:6px;
+    margin-top:20px;
+}
+
+.count-summary>div {
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    font-size:12px;
+    padding:7px 0;
+}
+
+.count-summary .difference {
+    border-top:1px solid #dce6f8;
+    margin-top:5px;
+    padding-top:12px;
+}
+
+.bill-credits {
+    margin-top:12px;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    color:#526174;
+    font-size:10px;
+}
+
+.bill-credits summary {
+    color:#25334a;
+    cursor:pointer;
+    font-weight:700;
+}
+
+.bill-credits p {
+    margin:8px 0;
+}
+
+.bill-credits ul {
+    display:flex;
+    flex-wrap:wrap;
+    gap:4px 12px;
+    margin:6px 0;
+    padding:0;
+    list-style:none;
+}
+
+.bill-credits a {
+    color:#2457a6;
+}
+
+@media print {
+    .cash-inventory-print .cash-toolbar,
+    .cash-inventory-print>.alert,
+    .cash-inventory-print>.metrics-grid,
+    .cash-inventory-print .app-footer,
+    .cash-inventory-print #cashCount .section-heading,
+    .cash-inventory-print #cashCount .count-head,
+    .cash-inventory-print #cashCount .count-row,
+    .cash-inventory-print #cashCount .bill-credits,
+    .cash-inventory-print #cashCount .btn,
+    .cash-inventory-print #cashCount .small.text-secondary,
+    .cash-inventory-print .cash-grid>div>.card-panel:not(#cashOperations):not(#inventoryHistory) {
+        display:none!important;
+    }
+
+    .cash-inventory-print .cash-grid {
+        display:block;
+        margin:0;
+    }
+
+    .cash-inventory-print .cash-grid>div {
+        margin:0!important;
+    }
+
+    .cash-inventory-print #cashCount {
+        width:100%;
+        margin:0;
+    }
+
+    .cash-inventory-print #inventoryHistory details:not([open])>:not(summary) {
+        display:block!important;
+    }
+}
+
+@media(max-width:700px) {
+    .bill-visual {
+        width:min(100%,88px);
+    }
+
+    .bill-note {
+        width:min(100%,88px);
+    }
+}
+

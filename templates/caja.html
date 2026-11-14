@@ -1,0 +1,248 @@
+{% extends "panel.html" %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/caja.css') }}">
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script defer src="{{ url_for('static', filename='js/caja.js') }}"></script>
+{% endblock %}
+
+{% block page_content %}
+<div class="cash-toolbar card-panel">
+<span class="tag {{ 'good' if cash.get('estado') == 'abierta' else '' }}">{{ icon('lock') }} Caja {{ cash.get('estado', 'sin apertura') }}</span>
+<span class="small">{{ updated|datefmt }}</span>
+<div class="ms-auto d-flex gap-2 flex-wrap">
+<button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#openCash" {% if cash.get('estado') == 'abierta' %}disabled{% endif %}>Apertura de caja</button>
+<button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#transferCash" {% if cash.get('estado') != 'abierta' %}disabled{% endif %}>Transferir a bóveda</button>
+<a href="#cashCount" class="btn btn-primary">Arqueo de cierre</a>
+</div>
+</div>
+{% if not cash %}<div class="alert alert-info mt-3">Aún no hay una caja registrada. La primera apertura establecerá el efectivo inicial; la bóveda comenzará con saldo cero.</div>{% endif %}
+<div class="metrics-grid three mt-4">{{ stat('RESERVA REGISTRADA', cash.get('saldoBoveda', 0)|money, 'Bóveda central · transferencias registradas', 'lock') }}{{ stat('EFECTIVO EN MOSTRADOR', cash.get('saldoCaja', 0)|money, 'Caja general · saldo en el sistema', 'wallet') }}{{ stat('PENDIENTE DE LIQUIDAR', pending_cash|money, 'Recibos de efectivo sin liquidación en este panel', 'people') }}</div>
+<div class="cash-grid">
+<section class="card-panel" id="cashCount">
+<div class="section-heading">
+<div>
+<h2>{{ icon('wallet') }} Desglose de Billetaje Físico</h2>
+<p>Billetes en córdobas (NIO) · Las monedas se registran como importe total</p>
+</div>
+</div>
+<form method="post" action="{{ url_for('save_cash_inventory') }}" data-count-form data-balance="{{ cash.get('saldoCaja', 0) }}" data-confirm="¿Confirmas guardar este inventario de efectivo?">{{ csrf() }}<input type="hidden" name="accion" value="cierre">
+<input type="hidden" name="operacion" value="{{ operation_id() }}">
+<div class="padded pt-0">
+<div class="count-head">
+<span>DENOMINACIÓN</span>
+<span>UNIDADES</span>
+<span>MONTO</span>
+</div>
+{% set bill_images = {10: 'images/billetes/billete-10.jpg', 20: 'images/billetes/billete-20.jpg', 50: 'images/billetes/billete-50.jpg', 100: 'images/billetes/billete-100.jpg', 200: 'images/billetes/billete-200-actual.jpg', 500: 'images/billetes/billete-500-actual.jpg', 1000: 'images/billetes/billete-1000-cgb.jpg'} %}
+{% for d in denominations %}<div class="count-row">
+<label for="bill-{{ d }}" aria-label="Billete de C$ {{ d }}">
+{% if d in bill_images %}
+<span class="bill-visual">
+<img class="bill-photo" src="{{ url_for('static', filename=bill_images[d]) }}" alt="Billete de C$ {{ d }}" loading="lazy" decoding="async">
+</span>
+{% else %}
+<span class="bill-visual">
+<svg class="bill-note bill-note-{{ d }}" viewBox="0 0 120 58" role="img" aria-label="Billete ilustrativo de C$ {{ d }}">
+<rect class="note-paper" x="1" y="1" width="118" height="56" rx="7"></rect>
+<rect class="note-frame" x="5" y="5" width="110" height="48" rx="4"></rect>
+<circle class="note-seal" cx="25" cy="29" r="15"></circle>
+<circle class="note-seal-inner" cx="25" cy="29" r="11"></circle>
+<text class="note-currency" x="25" y="32">C$</text>
+<text class="note-value" x="48" y="35">{{ d }}</text>
+<text class="note-unit" x="87" y="46">NIO</text>
+</svg>
+<small class="bill-era">Ilustración de referencia</small>
+</span>
+{% endif %}
+</label>
+<input type="number" class="form-control" id="bill-{{ d }}" name="billete_{{ d }}" data-denomination="{{ d }}" min="0" max="1000000" step="1" value="0" required aria-label="Cantidad de billetes de {{ d }}">
+<output class="mono" data-line-total>C$ 0.00</output>
+</div>{% endfor %}<div class="count-row">
+<label for="coins">Monedas (C$1, C$5 y otras)</label>
+<input class="form-control" id="coins" name="monedas" type="number" min="0" step=".01" value="0" data-coins aria-label="Importe total de monedas">
+<span class="small text-secondary">Importe total</span>
+</div>
+<details class="bill-credits">
+<summary>Fuentes y licencias de las imágenes</summary>
+<p>Fotos de C$10, C$20, C$50 y C$100: NagerLB, vía Wikimedia Commons, <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a>; redimensionadas para mostrarse aquí.</p>
+<ul>
+<li><a href="https://commons.wikimedia.org/wiki/File:10_Cordoba_front_2015.jpg" target="_blank" rel="noopener noreferrer">Billete de C$10</a></li>
+<li><a href="https://commons.wikimedia.org/wiki/File:20_Cordobas_front.jpg" target="_blank" rel="noopener noreferrer">Billete de C$20</a></li>
+<li><a href="https://commons.wikimedia.org/wiki/File:NIO_50_obverse_Polymer_2015_Series.jpg" target="_blank" rel="noopener noreferrer">Billete de C$50</a></li>
+<li><a href="https://commons.wikimedia.org/wiki/File:NIO_100_obverse_2015_Polymer.jpg" target="_blank" rel="noopener noreferrer">Billete de C$100</a></li>
+</ul>
+<p>Foto de C$500: Alfberrios, vía Wikimedia Commons, bajo <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a>.</p>
+<ul>
+<li><a href="https://commons.wikimedia.org/wiki/File:500cordobasANV.jpg" target="_blank" rel="noopener noreferrer">Billete de C$500</a></li>
+</ul>
+<p>Foto de C$200 proporcionada por el usuario, con autorización de reutilización confirmada. <a href="https://en.numista.com/catalogue/examples/pictures/69bd0fb965f01.jpg" target="_blank" rel="noopener noreferrer">Fuente</a>.</p>
+<p>Foto de C$1000: CGB, proporcionada por el usuario con autorización de reutilización confirmada. <a href="https://images3.cgb.fr/images/billets/b86/b86_1748a.jpg" target="_blank" rel="noopener noreferrer">Fuente</a>.</p>
+</details>
+<div class="count-summary">
+<div>
+<span>Total físico</span>
+<strong class="mono" data-count-total>C$ 0.00</strong>
+</div>
+<div>
+<span>Saldo registrado</span>
+<strong class="mono">{{ cash.get('saldoCaja', 0)|money }}</strong>
+</div>
+<div class="difference">
+<span>Diferencia</span>
+<strong class="mono" data-count-difference>
+</strong>
+</div>
+</div>
+<label class="form-label w-100 mt-3">Observación / motivo de diferencia<textarea class="form-control" name="motivo" maxlength="500" rows="2">
+</textarea>
+</label>
+<button type="submit" class="btn btn-primary w-100 mt-2">Guardar inventario</button>
+<p class="small text-secondary mt-2">Guarda el conteo y su historial sin modificar los saldos ni cerrar la caja.</p>
+<button type="submit" class="btn btn-outline-primary w-100 mt-2" formaction="{{ url_for('cash_operation') }}" data-confirm="¿Confirmas el cierre de caja con este conteo?" {% if cash.get('estado') != 'abierta' %}disabled{% endif %}>Confirmar arqueo y cerrar caja</button>
+</div>
+</form>
+</section>
+<div>
+<section class="card-panel">
+<div class="section-heading">
+<div>
+<h2>Entrega y Liquidación de Cobradores</h2>
+<p>Recibos en efectivo aún no recibidos en caja</p>
+</div>
+</div>
+<div class="table-responsive">
+<table class="table data-table align-middle">
+<thead>
+<tr>
+<th>Cobrador</th>
+<th class="text-end">Reportado</th>
+<th>Entrega</th>
+</tr>
+</thead>
+<tbody>{% for u in data.cobradores %}<tr>
+<td>
+<strong>{{ u.nombre }}</strong>
+<small>{{ u.get('ruta') or 'Sin ruta' }}</small>
+</td>
+<td class="text-end mono">{{ u.pendienteCaja|money }}</td>
+<td>
+<button class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#settle-{{ loop.index }}" {% if cash.get('estado') != 'abierta' or u.pendienteCaja <= 0 %}disabled{% endif %}>Recibir</button>
+</td>
+</tr>{% else %}<tr>
+<td colspan="3">{{ empty() }}</td>
+</tr>{% endfor %}</tbody>
+</table>
+</div>
+<div class="panel-note">Verifica los recibos históricos antes de liquidar: esta base no tenía un registro previo de entregas a caja.</div>
+</section>
+<section class="card-panel mt-4" id="cashOperations">
+<div class="section-heading">
+<h2>Últimas operaciones de caja</h2>
+</div>
+<div class="table-responsive">
+<table class="table data-table" data-paginate="8">
+<thead>
+<tr>
+<th>Fecha</th>
+<th>Operación</th>
+<th class="text-end">Importe</th>
+</tr>
+</thead>
+<tbody>{% for r in cash_history %}<tr>
+<td>{{ r.get('fecha')|datefmt }}</td>
+<td>{{ r.tipo|capitalize }}<small>{{ r.get('cobrador', '') }}</small>{% if r.get('diferencia') %}<small class="text-danger">Diferencia: {{ r.diferencia|money }}</small>{% endif %}</td>
+<td class="text-end mono">{{ r.monto|money }}</td>
+</tr>{% else %}<tr>
+<td colspan="3">{{ empty('No hay operaciones de caja.') }}</td>
+</tr>{% endfor %}</tbody>
+</table>
+</div>
+</section>
+<section class="card-panel mt-4" id="inventoryHistory">
+<div class="section-heading"><div>
+<h2>Historial de dinero inventariado</h2>
+<p>Conteos guardados de efectivo en mostrador</p>
+</div></div>
+<div class="table-responsive">
+<table class="table data-table align-middle" data-paginate="8">
+<thead><tr><th>Fecha / responsable</th><th class="text-end">Total físico</th><th>Desglose</th></tr></thead>
+<tbody>{% for r in inventory_history %}
+{% set detail = r.get('detalle', {}) %}
+<tr>
+<td>{{ r.get('fecha')|datefmt }}<small>{{ r.get('adminNombre') or r.get('adminId', 'Sin responsable') }}</small></td>
+<td class="text-end mono">{{ r.monto|money }}</td>
+<td><details><summary>Ver conteo</summary>
+<ul class="list-unstyled mt-2">
+{% for d in denominations %}
+{% set units = detail.get('billetes', {}).get(d|string, 0) %}
+<li>{{ d|money }} × {{ units }} = {{ (d * units)|money }}</li>
+{% endfor %}
+<li>Monedas: {{ detail.get('monedas', 0)|money }}</li>
+</ul>
+<p class="mb-1">Saldo registrado al contar: {{ r.get('saldoAnterior', 0)|money }}</p>
+<p class="mb-1 {{ 'text-danger' if r.get('diferencia') else 'text-success' }}">Diferencia: {{ r.get('diferencia', 0)|money }}</p>
+<p class="mb-1">Caja {{ detail.get('estadoCaja', 'sin apertura') }}</p>
+{% if detail.get('observacion') %}<p class="mb-0">Observación: {{ detail.observacion }}</p>{% endif %}
+</details></td>
+</tr>{% else %}<tr><td colspan="3">{{ empty('Aún no hay inventarios guardados.') }}</td></tr>{% endfor %}
+</tbody></table>
+</div></section>
+<div class="protocol card-panel mt-4">{{ icon('shield') }}<div>
+<strong>Registro de auditoría</strong>
+<p>Las aperturas, inventarios, entregas, transferencias y cierres conservan fecha y administrador responsable.</p>
+</div>
+</div>
+</div>
+</div>
+{% for action, modal, title in [('apertura','openCash','Apertura de caja'), ('transferencia','transferCash','Transferir a bóveda central')] %}<div class="modal fade" id="{{ modal }}" tabindex="-1" aria-label="{{ title }}">
+<div class="modal-dialog">
+<form class="modal-content" method="post" action="/caja/operacion" data-confirm="¿Confirmas esta operación de caja?">{{ csrf() }}<input type="hidden" name="accion" value="{{ action }}">
+<input type="hidden" name="operacion" value="{{ operation_id() }}">
+<div class="modal-header">
+<h2 class="modal-title">{{ title }}</h2>
+<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
+</button>
+</div>
+<div class="modal-body">
+<label class="form-label w-100">Monto en córdobas<input class="form-control" type="number" name="monto" min="0" max="1000000000" step=".01" required value="{{ cash.get('saldoCaja', 0) if action == 'apertura' else '' }}">
+</label>
+<p class="small text-secondary">{{ 'La primera apertura registra el fondo inicial. Las siguientes deben coincidir con el último saldo.' if action == 'apertura' else 'El importe se descuenta de caja y se suma a la bóveda en la misma operación.' }}</p>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+<button class="btn btn-primary">Confirmar</button>
+</div>
+</form>
+</div>
+</div>{% endfor %}
+{% for u in data.cobradores %}<div class="modal fade" id="settle-{{ loop.index }}" tabindex="-1" aria-label="Recibir liquidación">
+<div class="modal-dialog">
+<form class="modal-content" method="post" action="/caja/liquidar" data-confirm="¿Confirmas que recibiste este efectivo?">{{ csrf() }}<input type="hidden" name="operacion" value="{{ operation_id() }}">
+<input type="hidden" name="cobrador" value="{{ u.id }}">
+<div class="modal-header">
+<h2 class="modal-title">Recibir entrega</h2>
+<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
+</button>
+</div>
+<div class="modal-body">
+<strong>{{ u.nombre }}</strong>
+<p>Reportado pendiente: {{ u.pendienteCaja|money }}</p>
+<label class="form-label w-100">Efectivo recibido (C$)<input class="form-control" name="monto" type="number" min="0" max="1000000000" step=".01" value="{{ u.pendienteCaja }}" required>
+</label>
+<label class="form-label w-100">Motivo de diferencia / observación<textarea class="form-control" name="motivo" maxlength="500">
+</textarea>
+</label>
+<p class="small text-secondary">Se liquidan todos los recibos de efectivo pendientes del cobrador. Cada recibo se incluye una sola vez.</p>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+<button class="btn btn-primary">Registrar entrega</button>
+</div>
+</form>
+</div>
+</div>{% endfor %}
+{% endblock %}

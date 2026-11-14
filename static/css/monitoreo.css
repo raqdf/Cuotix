@@ -1,0 +1,32 @@
+/* Cuotix: monitoreo. */
+.collector-progress {
+    margin-bottom:25px;
+}
+
+.collector-progress>div:first-child {
+    display:flex;
+    align-items:start;
+    justify-content:space-between;
+    gap:10px;
+    font-size:11px;
+    margin-bottom:9px;
+}
+
+.collector-progress strong {
+    font-weight:500;
+}
+
+.collector-progress small {
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    font-size:9px;
+    color:#7c8494;
+    margin-top:7px;
+}
+
+.collector-progress small span {
+    color:var(--green);
+    text-align:right;
+}
+

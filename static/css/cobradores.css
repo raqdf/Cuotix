@@ -1,0 +1,16 @@
+/* Cuotix: cobradores. */
+.role {
+    font-size:8px;
+    text-transform:uppercase;
+    color:var(--blue);
+    background:var(--tint);
+    display:inline-block;
+    margin-left:5px;
+    padding:1px 5px;
+}
+
+.id-text {
+    max-width:170px;
+    overflow-wrap:anywhere;
+}
+

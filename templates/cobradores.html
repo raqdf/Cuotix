@@ -102,7 +102,7 @@
 {% for u in users %}{% if u.get('rol', '')|lower == 'cobrador' %}
 <div class="modal fade" id="edit-{{ loop.index }}" tabindex="-1" aria-label="Editar cobrador">
 <div class="modal-dialog modal-lg">
-<form class="modal-content" method="post" action="{{ url_for('edit_collector', uid=u.id) }}">{{ csrf() }}<div class="modal-header">
+<form class="modal-content" method="post" action="{{ url_for('collectors.edit_collector', uid=u.id) }}">{{ csrf() }}<div class="modal-header">
 <h2 class="modal-title">Editar · {{ u.nombre }}</h2>
 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
 </button>
@@ -122,7 +122,7 @@
 </div>
 <div class="modal fade" id="state-{{ loop.index }}" tabindex="-1" aria-label="Cambiar acceso">
 <div class="modal-dialog">
-<form class="modal-content" method="post" action="{{ url_for('collector_status', uid=u.id) }}" data-confirm="¿Confirmas el cambio de acceso y la reasignación indicada?">{{ csrf() }}<div class="modal-header">
+<form class="modal-content" method="post" action="{{ url_for('collectors.collector_status', uid=u.id) }}" data-confirm="¿Confirmas el cambio de acceso y la reasignación indicada?">{{ csrf() }}<div class="modal-header">
 <h2 class="modal-title">Control de acceso</h2>
 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
 </button>

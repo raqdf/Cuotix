@@ -20,7 +20,7 @@
 <p>{% if page == 'monitor' %}Supervisión de recaudación en campo y cartera activa de microcréditos.{% elif page == 'cobradores' %}Gestiona tu equipo, sus accesos y la asignación de cartera.{% elif page == 'caja' %}Control de entregas, conteo físico y custodia de fondos.{% elif page == 'clientes' %}Consulta de créditos, amortización y pagos registrados por cliente.{% elif page == 'reportes' %}Una visión de la colocación, la cobranza y el rendimiento de tu equipo.{% elif page == 'apariencia' %}Personaliza los colores del panel en este navegador.{% else %}Últimas 100 acciones realizadas desde este panel.{% endif %}</p>
 </div>
 <div class="heading-actions">{% if page == 'cobradores' %}<a class="btn btn-light" href="/auditoria">{{ icon('clock') }} Log de auditoría</a>{% elif page not in ['auditoria', 'apariencia'] %}<button class="btn btn-light" type="button" data-print>{{ icon('print') }} Imprimir / PDF</button>
-<a class="btn btn-primary" href="{{ url_for('export', collection='clientes' if page == 'clientes' else 'movimientosCaja' if page == 'caja' else 'facturas', desde=start, hasta=end, cobrador=collector) }}">{{ icon('download') }} Exportar CSV</a>{% endif %}</div>
+<a class="btn btn-primary" href="{{ url_for('dashboard.export', collection='clientes' if page == 'clientes' else 'movimientosCaja' if page == 'caja' else 'facturas', desde=start, hasta=end, cobrador=collector) }}">{{ icon('download') }} Exportar CSV</a>{% endif %}</div>
 </div>
 
 {% block page_content %}{% endblock %}

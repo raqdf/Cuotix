@@ -32,7 +32,7 @@
 <small class="text-primary">{{ r.get('numeroFactura', r.id) }}</small>
 </td>
 <td>
-<a href="{{ url_for('panel', page='clientes', cliente=r.cliente_id) }}">{{ r.cliente }}</a>
+<a href="{{ url_for('dashboard.panel', page='clientes', cliente=r.cliente_id) }}">{{ r.cliente }}</a>
 </td>
 <td>
 <span class="dot">

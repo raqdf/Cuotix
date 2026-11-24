@@ -1,6 +1,6 @@
 <header class="topbar">
 <button class="mobile-toggle btn btn-light" type="button" aria-label="Abrir menú" aria-controls="sidebar" aria-expanded="false">{{ icon('menu') }}</button>
-<form action="{{ url_for('panel', page='clientes') }}" class="global-search">{{ icon('search') }}<input name="q" aria-label="Buscar cliente por nombre o cédula" placeholder="Buscar nombre o cédula de cliente…">
+<form action="{{ url_for('dashboard.panel', page='clientes') }}" class="global-search">{{ icon('search') }}<input name="q" aria-label="Buscar cliente por nombre o cédula" placeholder="Buscar nombre o cédula de cliente…">
 </form>
 <div class="branch">{{ icon('bank') }}<span>Sucursal Central<small>Juigalpa, Chontales</small>
 </span>

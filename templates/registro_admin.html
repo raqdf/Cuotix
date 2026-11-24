@@ -29,7 +29,7 @@
 {% if not login_configured and not local_login_configured %}
 <div class="alert alert-warning small">Para iniciar sesión configura FIREBASE_WEB_API_KEY o LOCAL_ADMIN_EMAIL y LOCAL_ADMIN_PASSWORD en .env.</div>
 {% endif %}
-<form method="post" action="{{ url_for('register_admin') }}">
+<form method="post" action="{{ url_for('auth.register_admin') }}">
 {{ csrf() }}
 <label class="form-label" for="nombres">Nombres</label>
 <input class="form-control mb-3" id="nombres" name="nombres" autocomplete="given-name" required maxlength="100">
@@ -43,7 +43,7 @@
 <input class="form-control mb-3" type="password" id="password_confirm" name="password_confirm" autocomplete="new-password" required minlength="12" maxlength="128">
 <button class="btn btn-primary w-100 btn-login" {% if not configured %}disabled{% endif %}>Crear cuenta administradora</button>
 </form>
-<a class="btn btn-light w-100 mt-3" href="{{ url_for('login') }}">Volver al inicio de sesión</a>
+<a class="btn btn-light w-100 mt-3" href="{{ url_for('auth.login') }}">Volver al inicio de sesión</a>
 </section>
 </div>
 </main>

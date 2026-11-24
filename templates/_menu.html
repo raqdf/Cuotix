@@ -17,7 +17,7 @@
 {% if admin.get('temporal') %}
 <div class="logout">{{ icon('lock') }} Acceso local temporal</div>
 {% else %}
-<form method="post" action="{{ url_for('logout') }}">{{ csrf() }}<button class="logout">{{ icon('exit') }} Cerrar sesión</button>
+<form method="post" action="{{ url_for('auth.logout') }}">{{ csrf() }}<button class="logout">{{ icon('exit') }} Cerrar sesión</button>
 </form>
 {% endif %}
 </div>

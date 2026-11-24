@@ -29,7 +29,7 @@
 <p>Billetes en córdobas (NIO) · Las monedas se registran como importe total</p>
 </div>
 </div>
-<form method="post" action="{{ url_for('save_cash_inventory') }}" data-count-form data-balance="{{ cash.get('saldoCaja', 0) }}" data-confirm="¿Confirmas guardar este inventario de efectivo?">{{ csrf() }}<input type="hidden" name="accion" value="cierre">
+<form method="post" action="{{ url_for('cash.save_cash_inventory') }}" data-count-form data-balance="{{ cash.get('saldoCaja', 0) }}" data-confirm="¿Confirmas guardar este inventario de efectivo?">{{ csrf() }}<input type="hidden" name="accion" value="cierre">
 <input type="hidden" name="operacion" value="{{ operation_id() }}">
 <div class="padded pt-0">
 <div class="count-head">
@@ -102,7 +102,7 @@
 </label>
 <button type="submit" class="btn btn-primary w-100 mt-2">Guardar inventario</button>
 <p class="small text-secondary mt-2">Guarda el conteo y su historial sin modificar los saldos ni cerrar la caja.</p>
-<button type="submit" class="btn btn-outline-primary w-100 mt-2" formaction="{{ url_for('cash_operation') }}" data-confirm="¿Confirmas el cierre de caja con este conteo?" {% if cash.get('estado') != 'abierta' %}disabled{% endif %}>Confirmar arqueo y cerrar caja</button>
+<button type="submit" class="btn btn-outline-primary w-100 mt-2" formaction="{{ url_for('cash.cash_operation') }}" data-confirm="¿Confirmas el cierre de caja con este conteo?" {% if cash.get('estado') != 'abierta' %}disabled{% endif %}>Confirmar arqueo y cerrar caja</button>
 </div>
 </form>
 </section>

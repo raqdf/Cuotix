@@ -64,7 +64,7 @@
 {% elif not configured %}
 <div class="alert alert-warning small">Configura Firebase Web o habilita el acceso local temporal en Render para iniciar sesión.</div>
 {% endif %}
-<form method="post" action="{{ url_for('login') }}">{{ csrf() }}<label class="form-label" for="email">Correo electrónico <span class="text-danger">*</span>
+<form method="post" action="{{ url_for('auth.login') }}">{{ csrf() }}<label class="form-label" for="email">Correo electrónico <span class="text-danger">*</span>
 </label>
 <input class="form-control mb-4" type="email" id="email" name="email" autocomplete="username" placeholder="admin@tuempresa.com" required maxlength="150">
 <label class="form-label" for="password">Contraseña de acceso <span class="text-danger">*</span>
@@ -76,7 +76,7 @@
 <div class="session-note">{{ icon('clock') }} Cierre de sesión tras 15 minutos de inactividad</div>
 <button class="btn btn-primary w-100 btn-login" {% if not can_login %}disabled{% endif %}>Ingresar al Panel de Control {{ icon('arrow') }}</button>
 </form>
-<a class="btn btn-light w-100 mt-3" href="{{ url_for('register_admin') }}">Crear primera cuenta de administrador</a>
+<a class="btn btn-light w-100 mt-3" href="{{ url_for('auth.register_admin') }}">Crear primera cuenta de administrador</a>
 <div class="access-help">{{ icon('lock') }} Tu cuenta debe tener el rol Admin en Cuotix.</div>
 </section>
 </div>

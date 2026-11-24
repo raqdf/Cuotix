@@ -5,6 +5,11 @@
 {% endblock %}
 
 {% block page_content %}
+{% set avatar = namespace(index=0) %}
+{% for client in clients %}
+{% if selected and client.id == selected.id %}{% set avatar.index = loop.index0 %}{% endif %}
+{% endfor %}
+{% if request.args.get('vista') != 'historial' %}
 <form method="get" class="filterbar card-panel">
 <div class="flex-grow-1">
 <label for="clientSearch">Nombre o cédula de identidad</label>
@@ -13,12 +18,67 @@
 <button class="btn btn-primary">{{ icon('search') }} Consultar expediente</button>
 <a class="btn btn-light" href="/clientes">Ver todos</a>
 </form>
-<div class="client-tabs">{% for c in clients %}<a class="tag {{ 'selected' if selected and c.id == selected.id }}" href="{{ url_for('panel', page='clientes', cliente=c.id, q=q) }}">{{ c.nombre }}</a>{% endfor %}</div>
-{% if selected %}
+<section class="card-panel client-directory mb-4">
+<div class="section-heading">
+<div>
+<h2>Listado de clientes</h2>
+<p>Consulta la información y abre el expediente de cada cliente.</p>
+</div>
+<span class="client-count">{{ clients|length }} {{ 'cliente' if clients|length == 1 else 'clientes' }}</span>
+</div>
+<div class="table-responsive">
+<table class="table data-table client-directory-table">
+<thead>
+<tr>
+<th>Cliente</th>
+<th>Cédula</th>
+<th>Teléfono</th>
+<th>Cobrador</th>
+<th class="text-end">Créditos</th>
+<th class="text-end">Saldo pendiente</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+{% for c in clients %}
+{% set account = namespace(credits=0, saldo=0) %}
+{% for credit in data.creditos if credit.cliente_id == c.id %}
+{% set account.credits = account.credits + 1 %}
+{% set account.saldo = account.saldo + number(credit.get('saldoPendiente')) %}
+{% endfor %}
+<tr>
+<td data-label="Cliente">
+<div class="directory-person">
+<span class="avatar small client-user-avatar">{{ icon('client-avatar-' ~ (loop.index0 % 5)) }}</span>
+<div><strong>{{ c.nombre }}</strong><span>{{ c.get('direccion', 'Sin dirección') }}</span></div>
+</div>
+</td>
+<td data-label="Cédula" class="mono">{{ c.get('cedula', 'Sin cédula') }}</td>
+<td data-label="Teléfono">{{ c.get('numero', 'Sin teléfono') }}</td>
+<td data-label="Cobrador">{{ c.cobrador }}</td>
+<td data-label="Créditos" class="text-end mono">{{ account.credits }}</td>
+<td data-label="Saldo pendiente" class="text-end mono {{ 'text-primary' if account.saldo > 0 else 'text-secondary' }}">{{ account.saldo|money }}</td>
+<td data-label="Expediente" class="text-end">
+<a class="btn btn-outline-primary btn-sm history-link" href="{{ url_for('panel', page='clientes', cliente=c.id, q=q, vista='historial') }}" aria-label="Ver historial de {{ c.nombre }}">Ver historial <span aria-hidden="true">↗</span></a>
+</td>
+</tr>
+{% else %}
+<tr><td colspan="7">{{ empty('No encontramos clientes con esos datos.') }}</td></tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+</section>
+{% else %}
+<div class="history-back">
+<a class="btn btn-light" href="{{ url_for('panel', page='clientes', q=q) }}">← Volver al listado de clientes</a>
+</div>
+{% endif %}
+{% if selected and request.args.get('vista') == 'historial' and request.args.get('cliente') == selected.id %}
 <div class="client-summary">
 <section class="card-panel padded">
 <div class="person">
-<span class="avatar large">{{ selected.nombre[:2]|upper }}</span>
+<span class="avatar large client-user-avatar">{{ icon('client-avatar-' ~ (avatar.index % 5)) }}</span>
 <div>
 <h2>{{ selected.nombre }}</h2>
 <span class="mono small">{{ selected.get('cedula', 'Sin cédula') }}</span>
@@ -146,5 +206,5 @@
 <p>Todos los recibos confirmados de este cliente</p>
 </div>
 </div>{{ receipts_table(client_receipts, true) }}</section>
-{% else %}<section class="card-panel">{{ empty('No encontramos clientes con esos datos.') }}</section>{% endif %}
+{% elif request.args.get('vista') == 'historial' %}<section class="card-panel">{{ empty('No encontramos el expediente solicitado.') }}</section>{% endif %}
 {% endblock %}

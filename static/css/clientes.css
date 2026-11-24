@@ -1,13 +1,190 @@
 /* Cuotix: clientes. */
-.client-tabs {
-    display:flex;
-    gap:8px;
-    flex-wrap:wrap;
-    margin:0 0 22px;
+.client-directory {
+    overflow:hidden;
+    border-radius:12px;
+    box-shadow:0 8px 24px rgba(59, 40, 24, .06);
 }
 
-.client-tabs .tag {
-    padding:6px 12px;
+.client-directory .section-heading {
+    align-items:center;
+    padding:20px 22px 16px;
+    margin:0;
+}
+
+.client-directory .section-heading h2 {
+    font-size:17px;
+    margin:0;
+}
+
+.client-directory .section-heading p {
+    color:var(--muted);
+    font-size:11px;
+    margin:5px 0 0;
+}
+
+.client-count {
+    flex-shrink:0;
+    padding:6px 11px;
+    color:var(--accent-dark);
+    background:var(--accent-soft);
+    border:1px solid var(--line);
+    border-radius:20px;
+    font-size:10px;
+    font-weight:600;
+}
+
+.client-directory-table {
+    margin:0;
+    min-width:930px;
+}
+
+.client-directory-table th {
+    padding:12px 14px;
+    color:var(--muted);
+    font-size:9px;
+    font-weight:700;
+    letter-spacing:.55px;
+    text-transform:uppercase;
+    white-space:nowrap;
+}
+
+.client-directory-table td {
+    max-width:none;
+    padding:15px 14px;
+    vertical-align:middle;
+    font-size:11px;
+}
+
+.client-directory-table td:nth-child(2),
+.client-directory-table td:nth-child(3),
+.client-directory-table td:nth-child(5),
+.client-directory-table td:nth-child(6) {
+    white-space:nowrap;
+}
+
+.client-directory-table td:nth-child(4) {
+    min-width:145px;
+}
+
+.client-directory-table tbody tr {
+    transition:background-color .15s ease;
+}
+
+.client-directory-table tbody tr:hover td {
+    background:#fffaf1;
+}
+
+.directory-person .avatar {
+    width:40px;
+    height:40px;
+    border-radius:50%;
+}
+
+.client-user-avatar {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex:0 0 auto;
+    padding:0;
+    line-height:1;
+    background:transparent;
+    border:0;
+    box-shadow:none;
+    overflow:hidden;
+}
+
+.directory-person .client-user-avatar .icon {
+    width:40px;
+    height:40px;
+    fill:none;
+    stroke:none;
+}
+
+.client-summary .client-user-avatar {
+    width:64px;
+    height:64px;
+    border-radius:18px;
+}
+
+.client-summary .client-user-avatar .icon {
+    width:64px;
+    height:64px;
+    fill:none;
+    stroke:none;
+}
+
+.directory-person div {
+    min-width:150px;
+}
+
+.directory-person strong {
+    color:var(--ink);
+    font-size:12px;
+    font-weight:650;
+}
+
+.directory-person {
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.directory-person strong,
+.directory-person div>span {
+    display:block;
+}
+
+.directory-person div>span {
+    color:var(--muted);
+    font-size:9px;
+    line-height:1.45;
+    margin-top:2px;
+    max-width:240px;
+}
+
+.history-link {
+    min-width:116px;
+    white-space:nowrap;
+    border-radius:7px;
+}
+
+.history-link span {
+    font-size:14px;
+    line-height:1;
+}
+
+.history-back {
+    margin-bottom:18px;
+}
+
+.client-summary>section,
+.credit-card,
+.client-summary~section {
+    border-radius:11px;
+}
+
+.client-summary .padded {
+    padding:22px;
+}
+
+.credit-card {
+    box-shadow:0 5px 18px rgba(59, 40, 24, .04);
+}
+
+.credit-card .section-heading {
+    padding:18px 22px;
+    border-bottom:1px solid var(--line);
+}
+
+.credit-card details summary {
+    color:var(--accent-dark);
+    cursor:pointer;
+    font-size:12px;
+    font-weight:600;
+}
+
+.client-summary .detail-row {
+    font-size:12px;
 }
 
 .client-summary {
@@ -68,5 +245,94 @@
     font-family:Consolas,monospace;
     display:block;
     font-weight:500;
+}
+
+@media(max-width:700px) {
+    .client-directory .section-heading {
+        align-items:flex-start;
+        gap:10px;
+        padding:17px 15px 13px;
+    }
+
+    .client-directory-table {
+        min-width:0;
+    }
+
+    .client-directory-table thead {
+        display:none;
+    }
+
+    .client-directory-table tbody,
+    .client-directory-table tbody tr,
+    .client-directory-table tbody td {
+        display:block;
+        width:100%;
+    }
+
+    .client-directory-table tbody tr {
+        padding:10px 14px;
+        border-bottom:1px solid var(--line);
+    }
+
+    .client-directory-table tbody tr:last-child {
+        border-bottom:0;
+    }
+
+    .client-directory-table td {
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:12px;
+        padding:7px 0;
+        border:0;
+        text-align:right!important;
+        white-space:normal!important;
+    }
+
+    .client-directory-table td[colspan] {
+        display:block;
+    }
+
+    .client-directory-table td[colspan]:before {
+        display:none;
+    }
+
+    .client-directory-table td:before {
+        content:attr(data-label);
+        color:var(--muted);
+        font-size:9px;
+        font-weight:700;
+        letter-spacing:.4px;
+        text-align:left;
+        text-transform:uppercase;
+    }
+
+    .client-directory-table td:first-child {
+        justify-content:flex-start;
+        padding:8px 0 12px;
+        border-bottom:1px solid var(--line);
+        margin-bottom:5px;
+    }
+
+    .client-directory-table td:first-child:before {
+        display:none;
+    }
+
+    .client-directory-table td:last-child {
+        justify-content:stretch;
+        padding-top:10px;
+    }
+
+    .client-directory-table td:last-child:before {
+        display:none;
+    }
+
+    .history-link {
+        width:100%;
+    }
+
+    .client-summary .padded {
+        padding:18px;
+    }
 }
 
